@@ -47,9 +47,8 @@ def findPhilosophy(startUrl):
 
             # Remove disambiguation link
             withoutDisambiguation = filter(isValidUrl,contentLinks)
-
-
-            nextUrl = baseUrl + withoutDisambiguation[0]["href"] # I should check the formatting of this
+            firstLink = withoutDisambiguation[0]["href"]
+            nextUrl = baseUrl + firstLink if firstLink.startswith("/wiki/") else firstLink # Append the base URL if the URL starts with /wiki, otherwise we have a full URL
             currentUrl = nextUrl
 
 
@@ -57,8 +56,13 @@ def findPhilosophy(startUrl):
 def isValidUrl(link):
     isValid = True
 
+    # Exclude disambiguations
     if link.has_attr("class") and "mw-disambig" in link.attrs["class"]:
          isValid = False
+
+    # Exclude files (such as images, video references, ..)
+    if link["href"].startswith("/wiki/File:"):
+        isValid = False
 
     return isValid
 
@@ -67,7 +71,8 @@ def isValidUrl(link):
 def main():
     global articlesEncountered
     articlesEncountered = []
-    start = raw_input("Enter the wikipedia URL from which to start the search:")
+    #start = raw_input("Enter the wikipedia URL from which to start the search:")
+    start = "https://en.wikipedia.org/wiki/Number"
     findPhilosophy(start)
     print "Done, path used:"
     pathString = ""
