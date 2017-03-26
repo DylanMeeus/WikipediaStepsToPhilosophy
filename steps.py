@@ -60,6 +60,14 @@ def isValidUrl(link):
     if link.has_attr("class") and "mw-disambig" in link.attrs["class"]:
          isValid = False
 
+    # Exclude hatnotes-children (these can say that a redirect happened)
+    if link.parent.has_attr("class") and "hatnote" in link.parent.attrs["class"]:
+         isValid = False
+
+    # Exclude translations and phonetic spellings of words
+    if link.parent.has_attr("class") and "IPA" in link.parent.attrs["class"]:
+         isValid = False
+
     # Exclude thumbnail links
     if link.parent.has_attr("class") and "thumbcaption" in link.parent.attrs["class"]:
         isValid = False
