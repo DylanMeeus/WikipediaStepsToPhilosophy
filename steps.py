@@ -60,6 +60,10 @@ def isValidUrl(link):
     if link.has_attr("class") and "mw-disambig" in link.attrs["class"]:
          isValid = False
 
+    # Exclude thumbnail links
+    if link.parent.has_attr("class") and "thumbcaption" in link.parent.attrs["class"]:
+        isValid = False
+
     # Exclude files (such as images, video references, ..)
     if link["href"].startswith("/wiki/File:"):
         isValid = False
