@@ -19,12 +19,15 @@ hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML,
        'Accept-Language': 'en-US,en;q=0.8',
        'Connection' : 'keep-alive'}
 
-startUrl = "https://en.wikipedia.org/wiki/Number"
+
 baseUrl = "https://en.wikipedia.org"
 
-def findPhilosophy():
+global articlesEncountered # The articles that were found when searching for philosophy
+
+def findPhilosophy(startUrl):
+    global articlesEncountered
     foundPhilosophy = False # false while we have not hit the "Philosophy" Wikipedia page
-    currentUrl = "https://en.wikipedia.org/wiki/Quality_(philosophy)"
+    currentUrl = startUrl
     while(foundPhilosophy == False):
         print "Looking for philosophy from: " + currentUrl
 
@@ -33,8 +36,7 @@ def findPhilosophy():
         wikiPage = urllib2.urlopen(request)
         soup = BeautifulSoup(wikiPage.read(),"html.parser")
         pageName = soup.find("h1",id="firstHeading").contents[0] # IDs are unique so there should only be one of these in the document.
-        print pageName
-
+        articlesEncountered.append(pageName)
 
         if(pageName == "Philosophy"):
             foundPhilosophy = True
@@ -63,8 +65,15 @@ def isValidUrl(link):
 
 
 def main():
-    findPhilosophy()
-    print "Done"
+    global articlesEncountered
+    articlesEncountered = []
+    start = raw_input("Enter the wikipedia URL from which to start the search:")
+    findPhilosophy(start)
+    print "Done, path used:"
+    pathString = ""
+    for article in articlesEncountered:
+        pathString += (article + " -> " if article != articlesEncountered[len(articlesEncountered)-1] else article)
 
+    print pathString
 
 main()
