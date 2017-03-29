@@ -45,14 +45,30 @@ def findPhilosophy(startUrl):
             pageContent = soup.find('div',id="mw-content-text")
             contentLinks = pageContent.find_all('a')
 
-            # Remove disambiguation link
-            withoutDisambiguation = filter(isValidUrl,contentLinks)
-            firstLink = withoutDisambiguation[0]["href"]
+            # Find all a-tags inside tables
+            tableUrls = []
+            tables = soup.find_all('table')
+            if(tables is not None):
+                for table in tables:
+                    for url in table.find_all('a'):
+                        tableUrls.append(url)
+
+            # We don't want to include the infobox URLs as valid redirection points
+            if(tableUrls is not None):
+                contentLinks = filter(lambda link : link not in tableUrls,contentLinks)
+
+
+            contentLinks = filter(isValidUrl,contentLinks)
+
+            firstLink = contentLinks[0]["href"]
             nextUrl = baseUrl + firstLink if firstLink.startswith("/wiki/") else firstLink # Append the base URL if the URL starts with /wiki, otherwise we have a full URL
             currentUrl = nextUrl
 
+        # foundPhilosophy = True
 
 
+
+""" Filter for valid URLs"""
 def isValidUrl(link):
     isValid = True
 
@@ -73,18 +89,23 @@ def isValidUrl(link):
         isValid = False
 
     # Exclude files (such as images, video references, ..)
-    if link["href"].startswith("/wiki/File:"):
+    if link["href"].startswith("/wiki/File:") or link["href"].startswith("//upload.wikimedia"):
         isValid = False
+
+    # Exclude anchors
+    if(link["href"].startswith("#")):
+        isValid = False
+
 
     return isValid
 
 
-
+"""Main method"""
 def main():
     global articlesEncountered
     articlesEncountered = []
     #start = raw_input("Enter the wikipedia URL from which to start the search:")
-    start = "https://en.wikipedia.org/wiki/Number"
+    start = "https://en.wikipedia.org/wiki/German_language"
     findPhilosophy(start)
     print "Done, path used:"
     pathString = ""
