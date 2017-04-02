@@ -120,7 +120,8 @@ def main():
     articlesEncountered = []
     visitedLinks = []
     #start = raw_input("Enter the wikipedia URL from which to start the search:")
-    start = "https://en.wikipedia.org/wiki/Randomness"
+    print "enter wikipedia url (en wiki)"
+    start = raw_input()
     findPhilosophy(start)
     print "Done, path used:"
     pathString = ""
