@@ -109,6 +109,9 @@ def isValidUrl(link):
     if(link["href"].startswith("#")):
         isValid = False
 
+    # Exclude urls that are about Wikipedia instead of articles
+    if(link["href"].startswith("/wiki/Wikipedia:")):
+        isValid = False
 
     return isValid
 
