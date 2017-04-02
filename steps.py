@@ -22,10 +22,13 @@ hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML,
 
 baseUrl = "https://en.wikipedia.org"
 
-global articlesEncountered # The articles that were found when searching for philosophy
+global articlesEncountered # The articles that were found when searching for philosophy, for output purpose
+global visitedLinks # Links that we have visited, we do not want to visit them twice
+
 
 def findPhilosophy(startUrl):
     global articlesEncountered
+    global visitedLinks
     foundPhilosophy = False # false while we have not hit the "Philosophy" Wikipedia page
     currentUrl = startUrl
     while(foundPhilosophy == False):
@@ -53,6 +56,8 @@ def findPhilosophy(startUrl):
                     for url in table.find_all('a'):
                         tableUrls.append(url)
 
+
+
             # We don't want to include the infobox URLs as valid redirection points
             if(tableUrls is not None):
                 contentLinks = filter(lambda link : link not in tableUrls,contentLinks)
@@ -60,7 +65,15 @@ def findPhilosophy(startUrl):
 
             contentLinks = filter(isValidUrl,contentLinks)
 
-            firstLink = contentLinks[0]["href"]
+            validLink = None
+            for link in contentLinks:
+                if link not in visitedLinks:
+                    validLink= link
+                    break
+
+
+            visitedLinks.append(validLink)
+            firstLink = validLink["href"]
             nextUrl = baseUrl + firstLink if firstLink.startswith("/wiki/") else firstLink # Append the base URL if the URL starts with /wiki, otherwise we have a full URL
             currentUrl = nextUrl
 
@@ -102,15 +115,17 @@ def isValidUrl(link):
 
 """Main method"""
 def main():
+    global visitedLinks
     global articlesEncountered
     articlesEncountered = []
+    visitedLinks = []
     #start = raw_input("Enter the wikipedia URL from which to start the search:")
-    start = "https://en.wikipedia.org/wiki/German_language"
+    start = "https://en.wikipedia.org/wiki/Randomness"
     findPhilosophy(start)
     print "Done, path used:"
     pathString = ""
     for article in articlesEncountered:
-        pathString += (article + " -> " if article != articlesEncountered[len(articlesEncountered)-1] else article)
+        pathString += (str(article) + " -> " if article != articlesEncountered[len(articlesEncountered)-1] else str(article))
 
     print pathString
 
